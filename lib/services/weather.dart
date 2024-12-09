@@ -1,4 +1,29 @@
+import 'location.dart';
+import 'networking.dart';
+
+const apiKey = '9569cf3c1fd9c623f06651dc3d25d770';
+const openWeatherMapURL = 'https://api.openweathermap.org/data/2.5/weather';
+
 class WeatherModel {
+  Future<dynamic> getCityWeather(String cityName) async {
+    NetworkHelper networkHelper = NetworkHelper(
+        '$openWeatherMapURL?q=$cityName&appid=$apiKey&units=metric');
+
+    var weatherData = await networkHelper.getData();
+    return weatherData;
+  }
+
+  Future<dynamic> getLocationWeather() async {
+    Location location = Location();
+    await location.getCurrentLocation();
+
+    if (location.city == null || location.city == 'Unknown') {
+      throw Exception('City name is unavailable. Cannot fetch weather data.');
+    }
+
+    return await getCityWeather(location.city!);
+  }
+
   String getWeatherIcon(int condition) {
     if (condition < 300) {
       return '🌩';
